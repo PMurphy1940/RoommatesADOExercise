@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="obj\Debug\netcoreapp3.1\.NETCoreApp,Version=v3.1.AssemblyAttributes.cs" />
+    <Compile Include="obj\Debug\netcoreapp3.1\Roommates.AssemblyInfo.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="obj\project.assets.json" />
+    <Content Include="obj\Roommates.csproj.nuget.dgspec.json" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="2.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="bin\Debug\netcoreapp3.1\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="obj\Debug\netcoreapp3.1\Roommates.AssemblyInfoInputs.cache" />
+    <None Include="obj\Debug\netcoreapp3.1\Roommates.assets.cache" />
+    <None Include="obj\Debug\netcoreapp3.1\Roommates.csprojAssemblyReference.cache" />
+    <None Include="obj\project.nuget.cache" />
+    <None Include="obj\Roommates.csproj.nuget.g.props" />
+    <None Include="obj\Roommates.csproj.nuget.g.targets" />
+  </ItemGroup>
+
+</Project>
