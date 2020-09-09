@@ -109,12 +109,6 @@ namespace Roommates.Repositories
 
                     while (reader.Read())
                     {
-                        Room aRoom = new Room
-                        {
-                            Id = reader.GetInt32(reader.GetOrdinal("RoomId")),
-                            Name = reader.GetString(reader.GetOrdinal("Name")),
-                            MaxOccupancy = reader.GetInt32(reader.GetOrdinal("MaxOccupancy"))
-                        };
                         Roommate roommate = new Roommate
                         {
                             Id = reader.GetInt32(reader.GetOrdinal("roommateId")),
@@ -122,7 +116,12 @@ namespace Roommates.Repositories
                             Lastname = reader.GetString(reader.GetOrdinal("Lastname")),
                             RentPortion = reader.GetInt32(reader.GetOrdinal("RentPortion")),
                             MoveInDate = reader.GetDateTime(reader.GetOrdinal("MoveInDate")),
-                            Room = aRoom
+                            Room = new Room
+                            {
+                                Id = reader.GetInt32(reader.GetOrdinal("RoomId")),
+                                Name = reader.GetString(reader.GetOrdinal("Name")),
+                                MaxOccupancy = reader.GetInt32(reader.GetOrdinal("MaxOccupancy"))
+                            }
                         };
                         roommatesByRoom.Add(roommate);
                     }
@@ -154,13 +153,48 @@ namespace Roommates.Repositories
                     roommate.Id = id;
 
                 }
-                conn.Close();
+                
             }
         }
 
         public void Update(Roommate roommate)
         {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand(){
+                    cmd.CommandText = @"UPDATE Roommate
+                                            SET FirstName = @FirstName, LastName = @LastName,
+                                                RentPortion = @RentPortion,
+                                                MoveInDate = @MoveInDate,
+                                                RoomId = @RoomId
+                                            WHERE Id = @id";
+                    cmd.Parameters.AddWithValue("@FirstName", roommate.Firstname);
+                    cmd.Parameters.AddWithValue("@LastName", roommate.Lastname);
+                    cmd.Parameters.AddWithValue("@RentPortion", roommate.RentPortion);
+                    cmd.Parameters.AddWithValue("@MoveInDate", roommate.MoveInDate);
+                    cmd.Parameters.AddWithValue("@RoomId", roommate.RoomId);
+                    cmd.Parameters.AddWithValue("@id", roommate.Id);
 
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
+        }
+
+        public void Delete(int id)
+        {
+            using(SqlConnection conn = Connection)
+            {
+                conn.Open();
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = "DELETE FROM Roommate WHERE id = @id";
+                    cmd.Parameters.AddWithValue("@id", id);
+                    cmd.ExecuteNonQuery();
+
+                }
+            }
         }
 
     }
