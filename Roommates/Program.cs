@@ -108,13 +108,13 @@ namespace Roommates
             if (choice == 1)
             {
                 Console.Clear();
-                RoommatePage(roommateRepo);
+                RoommatePage(roomRepo, roommateRepo);
             }
 
             
         }
 
-        private static void RoommatePage(RoommateRepository roommateRepo)
+        private static void RoommatePage(RoomRepository roomRepo, RoommateRepository roommateRepo)
         {
             int choice;
             
@@ -134,20 +134,64 @@ namespace Roommates
 
             if (choice == 1)
             {
-                ViewAllRoommates(roommateRepo);
+                ViewAllRoommates(roomRepo, roommateRepo);
             }
             else if (choice == 2)
             {
-                ViewSingleRoommate(roommateRepo);
+                ViewSingleRoommate(roomRepo, roommateRepo);
             }
             else if (choice == 3)
             {
-                AddARoommate(roommateRepo);
+                AddARoommate(roomRepo, roommateRepo);
             }
+            else if (choice == 4)
+            {
+                
+            }
+            else if (choice == 5)
+            {
+                DeleteARoommate(roomRepo, roommateRepo);
+            }
+            else if (choice == 6)
+            {
+                MainPage(roomRepo, roommateRepo);
+            }
+            else if (choice == 7)
+            {
+                string message = "Sorry Folks, the park's closed.";
+                MooseSaysGoodbye(message);
+            }
+        }
+
+        private static void DeleteARoommate(RoomRepository roomRepo, RoommateRepository roommateRepo)
+        {
+            string message = "Who's been voted out?";
+            List<Roommate> allRoommates = roommateRepo.GetAll();
+            int numberOfRoommates = allRoommates.Count;
+
+               int id = intMooseSays(message, allRoommates);
+
+            try
+            {
+                roommateRepo.Delete(id); 
+            }
+            catch (Exception)
+            {
+
+                string msg = "Sorry, there's no roommate with that index";
+                MooseSaysGoodbye(msg);
+                Console.WriteLine("Press any key");
+                Console.ReadKey();
+            }
+            
+
+
+            Console.Clear();
+                RoommatePage(roomRepo, roommateRepo);
 
         }
 
-        private static void AddARoommate(RoommateRepository roommateRepo)
+        private static void AddARoommate(RoomRepository roomRepo, RoommateRepository roommateRepo)
         {
             Console.Clear();
             string message = "Enter your new roommate's first name";
@@ -167,7 +211,7 @@ namespace Roommates
             {
                 message = "Cheapskate, huh?";
             }
-            else if (RentPortion > 10  || RentPortion <= 70)
+            else if (RentPortion > 10  && RentPortion <= 70)
             {
                 message = "Sounds reasonable.";
             }
@@ -193,15 +237,17 @@ namespace Roommates
                 };
 
                 roommateRepo.Insert(newRoomate);
+                Console.Clear();
+                RoommatePage(roomRepo, roommateRepo);
             }
             else
             {
-                RoommatePage(roommateRepo);
+                RoommatePage(roomRepo, roommateRepo);
             }
 
         }
 
-        private static void ViewSingleRoommate(RoommateRepository roommateRepo)
+        private static void ViewSingleRoommate(RoomRepository roomRepo, RoommateRepository roommateRepo)
         {
             int choice;
 
@@ -230,12 +276,12 @@ namespace Roommates
 
             if (YesNo == "y")
             {
-                ViewSingleRoommate(roommateRepo);
+                ViewSingleRoommate(roomRepo, roommateRepo);
             }
             else
             {
                 Console.Clear();
-                RoommatePage(roommateRepo);
+                RoommatePage(roomRepo, roommateRepo);
             }          
         }
 
@@ -251,7 +297,7 @@ namespace Roommates
             return userChoice;
         }
 
-        private static void ViewAllRoommates(RoommateRepository roommateRepo)
+        private static void ViewAllRoommates(RoomRepository roomRepo, RoommateRepository roommateRepo)
         {
 
             List<Roommate> allRoommates = roommateRepo.GetAll();
@@ -263,7 +309,7 @@ namespace Roommates
 
             Console.WriteLine("Press any key to continue");
             Console.ReadKey();
-            RoommatePage(roommateRepo);
+            RoommatePage(roomRepo, roommateRepo);
             
         }
 
@@ -395,14 +441,96 @@ namespace Roommates
 
    ");
             string response;
-            int percent;
+            int number;
             do
             {
                 response = Console.ReadLine();
-            } while (!int.TryParse(response, out percent));
+            } while (!int.TryParse(response, out number));
 
-            return percent;
+            return number;
 
         }
-    }
+
+        static int intMooseSays(string message, List<Roommate> allRoommates)
+        {
+            Console.Clear();
+            Console.WriteLine($@"
+                                      _.--^^^--,
+                                    .'          `\
+  .-^^^^^^-.                      .'              |
+ /          '.                   /            .-._/
+|             `.                |             |
+ \              \          .-._ |          _   \
+  `^^'-.         \_.-.     \   `          ( \__/
+        |             )     '=.       .,   \
+       /             (         \     /  \  /
+     /`               `\        |   /    `'
+     '..-`\        _.-. `\ _.__/   .=.
+          |  _    / \  '.-`    `-.'  /
+          \_/ |  |   './ _     _  \.'
+               '-'    | /       \ |
+                      |  .-. .-.  |
+                      \ / o| |o \ /
+                       |   / \   |    {message}
+                      / `^`   `^` \
+                     /             \
+                    | '._.'         \
+                    |  /             |
+                     \ |             |
+                      ||    _    _   /
+                      /|\  (_\  /_) /
+                      \ \'._  ` '_.'
+                       `^^` `^^^`
+
+   ");
+            string response;
+            int number;
+            foreach (Roommate roommate in allRoommates)
+            {
+                Console.WriteLine($"{roommate.Id} {roommate.Firstname} {roommate.Lastname}");
+            }
+            do
+            {
+                response = Console.ReadLine();
+            } while (!int.TryParse(response, out number));
+
+            return number;
+
+        }
+
+        static void MooseSaysGoodbye(string message)
+        {
+            Console.Clear();
+            Console.WriteLine($@"
+                                      _.--^^^--,
+                                    .'          `\
+  .-^^^^^^-.                      .'              |
+ /          '.                   /            .-._/
+|             `.                |             |
+ \              \          .-._ |          _   \
+  `^^'-.         \_.-.     \   `          ( \__/
+        |             )     '=.       .,   \
+       /             (         \     /  \  /
+     /`               `\        |   /    `'
+     '..-`\        _.-. `\ _.__/   .=.
+          |  _    / \  '.-`    `-.'  /
+          \_/ |  |   './ _     _  \.'
+               '-'    | /       \ |
+                      |  .-. .-.  |
+                      \ / o| |o \ /
+                       |   / \   |    {message}
+                      / `^`   `^` \
+                     /             \
+                    | '._.'         \
+                    |  /             |
+                     \ |             |
+                      ||    _    _   /
+                      /|\  (_\  /_) /
+                      \ \'._  ` '_.'
+                       `^^` `^^^`
+
+   ");
+        }
+        }
 }
+
