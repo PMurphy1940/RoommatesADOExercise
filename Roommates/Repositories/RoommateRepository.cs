@@ -141,14 +141,14 @@ namespace Roommates.Repositories
                 conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Roommate (FirstName, LastName, RentPortion, MoveInDate, RoomId
+                    cmd.CommandText = @"INSERT INTO Roommate (FirstName, LastName, RentPortion, MoveInDate, RoomId)
                                          OUTPUT INSERTED.Id
                                           VALUES (@FirstName, @LastName, @RentPortion, @MoveInDate, @RoomId)";
                     cmd.Parameters.AddWithValue("@FirstName", roommate.Firstname);
                     cmd.Parameters.AddWithValue("@LastName", roommate.Lastname);
                     cmd.Parameters.AddWithValue("@RentPortion", roommate.RentPortion);
                     cmd.Parameters.AddWithValue("@MoveInDate", roommate.MoveInDate);
-                    cmd.Parameters.AddWithValue("@RoomId", roommate.Room.Id);
+                    cmd.Parameters.AddWithValue("@RoomId", roommate.RoomId);
                     int id = (int)cmd.ExecuteScalar();
                     roommate.Id = id;
 
@@ -162,7 +162,8 @@ namespace Roommates.Repositories
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
-                using (SqlCommand cmd = conn.CreateCommand(){
+                using (SqlCommand cmd = conn.CreateCommand())
+                {
                     cmd.CommandText = @"UPDATE Roommate
                                             SET FirstName = @FirstName, LastName = @LastName,
                                                 RentPortion = @RentPortion,
