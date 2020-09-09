@@ -1,7 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Roommates.Models;
 using System.Collections.Generic;
-
+using System.Security.Cryptography.X509Certificates;
 
 namespace Roommates.Repositories
 {
@@ -39,7 +39,7 @@ namespace Roommates.Repositories
 
                         int rentPortion = reader.GetInt32(reader.GetOrdinal("RentPortion"));
 
-                        var moveIn = reader.GetDateTime(reader.GetOrdinal("MovedInDate"));
+                        var moveIn = reader.GetDateTime(reader.GetOrdinal("MoveInDate"));
 
                         Roommate roommate = new Roommate
                         {
@@ -101,7 +101,7 @@ namespace Roommates.Repositories
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = "SELECT Firstname, Lastname, RentPortion, MoveInDate FROM Roommate WHERE RoomId = @id";
+                    cmd.CommandText = "Select roommate.Id as roommateId, Firstname, Lastname, RentPortion, MoveInDate, Name, MaxOccupancy, RoomId FROM Roommate Left Join Room ON Room.id = Roommate.RoomId WHERE RoomId = @id";
                     cmd.Parameters.AddWithValue("@id", roomId);
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Roommate> roommatesByRoom = new List<Roommate>();
@@ -109,23 +109,60 @@ namespace Roommates.Repositories
 
                     while (reader.Read())
                     {
+                        Room aRoom = new Room
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("RoomId")),
+                            Name = reader.GetString(reader.GetOrdinal("Name")),
+                            MaxOccupancy = reader.GetInt32(reader.GetOrdinal("MaxOccupancy"))
+                        };
                         Roommate roommate = new Roommate
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
+                            Id = reader.GetInt32(reader.GetOrdinal("roommateId")),
                             Firstname = reader.GetString(reader.GetOrdinal("Firstname")),
                             Lastname = reader.GetString(reader.GetOrdinal("Lastname")),
                             RentPortion = reader.GetInt32(reader.GetOrdinal("RentPortion")),
-                            MoveInDate = reader.GetDateTime(reader.GetOrdinal("MoveInDate"))
+                            MoveInDate = reader.GetDateTime(reader.GetOrdinal("MoveInDate")),
+                            Room = aRoom
                         };
                         roommatesByRoom.Add(roommate);
                     }
 
                     reader.Close();
                     return roommatesByRoom;
+
                 }
 
             }
+        }
+
+        public void Insert(Roommate roommate)
+        {
+            using (SqlConnection conn = Connection)
+            {
+                conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())
+                {
+                    cmd.CommandText = @"INSERT INTO Roommate (FirstName, LastName, RentPortion, MoveInDate, RoomId
+                                         OUTPUT INSERTED.Id
+                                          VALUES (@FirstName, @LastName, @RentPortion, @MoveInDate, @RoomId)";
+                    cmd.Parameters.AddWithValue("@FirstName", roommate.Firstname);
+                    cmd.Parameters.AddWithValue("@LastName", roommate.Lastname);
+                    cmd.Parameters.AddWithValue("@RentPortion", roommate.RentPortion);
+                    cmd.Parameters.AddWithValue("@MoveInDate", roommate.MoveInDate);
+                    cmd.Parameters.AddWithValue("@RoomId", roommate.Room.Id);
+                    int id = (int)cmd.ExecuteScalar();
+                    roommate.Id = id;
+
+                }
+                conn.Close();
+            }
+        }
+
+        public void Update(Roommate roommate)
+        {
+
+        }
+
     }
-}
 
 }
